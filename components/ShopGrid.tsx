@@ -1,6 +1,5 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import type { Collection, PublicProduct, Size } from "@/lib/types";
 import { ALL_SIZES } from "@/lib/types";
@@ -18,7 +17,6 @@ export default function ShopGrid({
   collections: Collection[];
   initialCollection: string;
 }) {
-  const router = useRouter();
   const [collection, setCollection] = useState(initialCollection);
   const [size, setSize] = useState<Size | "all">("all");
   const [colour, setColour] = useState<string>("all");
@@ -48,7 +46,8 @@ export default function ShopGrid({
 
   const pickCollection = (slug: string) => {
     setCollection(slug);
-    router.replace(slug === "all" ? "/shop" : `/shop?collection=${slug}`, { scroll: false });
+    // filtering happens in the browser; just keep the URL shareable without re-fetching the page
+    window.history.replaceState(window.history.state, "", slug === "all" ? "/shop" : `/shop?collection=${slug}`);
   };
 
   const pill = (active: boolean) =>

@@ -2,7 +2,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Check, Hand, Pause, Play, Shirt } from "lucide-react";
 import type { PublicProduct, Size, SizeChartRow } from "@/lib/types";
 import { ALL_SIZES } from "@/lib/types";
@@ -57,7 +56,6 @@ export default function FittingRoom({
   sizeChart: SizeChartRow[];
   initial: { product?: string; color?: string; size?: string };
 }) {
-  const router = useRouter();
   const startProduct = products.find((p) => p.slug === initial.product) ?? products[0];
   const [productId, setProductId] = useState(startProduct?.id);
   const product = products.find((p) => p.id === productId) ?? products[0];
@@ -82,10 +80,15 @@ export default function FittingRoom({
   const stock = product && color ? stockOf(product, color.id, shirtSize) : 0;
 
   // keep the URL shareable
+  // Update the address bar in the browser only (no server round-trip), keyed on plain values so it
+  // can never loop. Using router.replace here re-fetched the page and re-triggered this effect.
+  const productSlug = product?.slug;
+  const colorKey = color?.id;
   useEffect(() => {
-    if (!product || !color) return;
-    router.replace(`/fitting-room?${new URLSearchParams({ product: product.slug, color: color.id, size: shirtSize })}`, { scroll: false });
-  }, [product, color, shirtSize, router]);
+    if (!productSlug || !colorKey) return;
+    const url = `/fitting-room?${new URLSearchParams({ product: productSlug, color: colorKey, size: shirtSize })}`;
+    if (window.location.pathname + window.location.search !== url) window.history.replaceState(window.history.state, "", url);
+  }, [productSlug, colorKey, shirtSize]);
 
   // keep the view label in sync while dragging / spinning
   useEffect(() => {
