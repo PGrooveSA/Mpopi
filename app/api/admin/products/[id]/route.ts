@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { mutate } from "@/lib/store";
-import { adminRoute, bad } from "@/lib/api";
+import { adminRoute, bad, UserError } from "@/lib/api";
 import { parseProduct } from "@/lib/product-input";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -13,7 +13,7 @@ export const PUT = adminRoute(async (req: Request, ctx: Ctx) => {
   try {
     const product = await mutate((db) => {
       const idx = db.products.findIndex((p) => p.id === id);
-      if (idx < 0) throw new Error("Product not found.");
+      if (idx < 0) throw new UserError("Product not found.");
       const p = parseProduct(body, db, db.products[idx]);
       db.products[idx] = p;
       return p;
@@ -21,7 +21,8 @@ export const PUT = adminRoute(async (req: Request, ctx: Ctx) => {
     revalidatePath("/", "layout");
     return NextResponse.json({ product });
   } catch (e) {
-    return bad(e instanceof Error ? e.message : "Could not save product.");
+    if (e instanceof UserError) return bad(e.message);
+    throw e;
   }
 });
 

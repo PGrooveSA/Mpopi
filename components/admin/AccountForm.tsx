@@ -53,8 +53,8 @@ export default function AccountForm({ me, admins }: { me: A; admins: A[] }) {
                 <input className="input" type="email" autoComplete="username" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               </div>
               <div>
-                <label className="label">New password (optional)</label>
-                <input className="input" type="password" autoComplete="new-password" minLength={8} value={form.newPassword} onChange={(e) => setForm({ ...form, newPassword: e.target.value })} />
+                <label className="label">New password (optional, 10+ characters)</label>
+                <input className="input" type="password" autoComplete="new-password" minLength={10} value={form.newPassword} onChange={(e) => setForm({ ...form, newPassword: e.target.value })} />
               </div>
               <div>
                 <label className="label">Current password *</label>
@@ -98,7 +98,7 @@ export default function AccountForm({ me, admins }: { me: A; admins: A[] }) {
           >
             <input className="input" placeholder="Name" value={add.name} onChange={(e) => setAdd({ ...add, name: e.target.value })} />
             <input className="input" type="email" required placeholder="Email" value={add.email} onChange={(e) => setAdd({ ...add, email: e.target.value })} />
-            <input className="input" type="password" required minLength={8} autoComplete="new-password" placeholder="Password" value={add.password} onChange={(e) => setAdd({ ...add, password: e.target.value })} />
+            <input className="input" type="password" required minLength={10} autoComplete="new-password" placeholder="Password (10+ characters)" value={add.password} onChange={(e) => setAdd({ ...add, password: e.target.value })} />
             <button disabled={busy === "add"} className="btn-dark sm:col-span-3">
               <UserPlus className="h-4 w-4" /> Add admin
             </button>

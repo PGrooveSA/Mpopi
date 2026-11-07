@@ -123,6 +123,8 @@ export interface AdminUser {
   email: string;
   name: string;
   passwordHash: string;
+  /** Bumped to invalidate all existing sessions (password change, sign out everywhere). */
+  tokenVersion?: number;
 }
 
 export interface DB {

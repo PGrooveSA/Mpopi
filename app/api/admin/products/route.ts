@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { mutate } from "@/lib/store";
-import { adminRoute, bad } from "@/lib/api";
+import { adminRoute, bad, UserError } from "@/lib/api";
 import { parseProduct } from "@/lib/product-input";
 
 export const POST = adminRoute(async (req: Request) => {
@@ -16,6 +16,7 @@ export const POST = adminRoute(async (req: Request) => {
     revalidatePath("/", "layout");
     return NextResponse.json({ product });
   } catch (e) {
-    return bad(e instanceof Error ? e.message : "Could not save product.");
+    if (e instanceof UserError) return bad(e.message);
+    throw e;
   }
 });

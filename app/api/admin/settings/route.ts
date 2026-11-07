@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { mutate } from "@/lib/store";
-import { adminRoute, bad, str, num } from "@/lib/api";
+import { adminRoute, bad, str, num, UserError, safeImageUrl, safeLink } from "@/lib/api";
 import { slugify } from "@/lib/shop";
 import { ALL_SIZES, type Settings, type Collection, type Size } from "@/lib/types";
 
-const URL_RE = /^(\/[\w\-./]+|https:\/\/[\w\-./%?=&]+)$/;
-const url = (v: unknown) => (URL_RE.test(str(v, 500)) ? str(v, 500) : "");
-const link = (v: unknown) => (/^https?:\/\//.test(str(v, 300)) ? str(v, 300) : "");
+const url = safeImageUrl;
+const link = safeLink;
 const arr = (v: unknown) => (Array.isArray(v) ? v : []) as Record<string, unknown>[];
 
 export const PUT = adminRoute(async (req: Request) => {
@@ -28,7 +27,7 @@ export const PUT = adminRoute(async (req: Request) => {
       subtitle: str(s.hero?.subtitle, 400),
       image: url(s.hero?.image),
     },
-    about: { title: str(s.about?.title, 120), body: str(s.about?.body, 5000), image: url(s.about?.image) },
+    about: { title: str(s.about?.title, 120), body: str(s.about?.body, 5000, true), image: url(s.about?.image) },
     deliveryOptions: arr(s.deliveryOptions)
       .slice(0, 10)
       .map((d, i) => ({
@@ -43,7 +42,7 @@ export const PUT = adminRoute(async (req: Request) => {
       .filter((r) => ALL_SIZES.includes(r.size as Size))
       .map((r) => ({ size: r.size as Size, chest: num(r.chest, 0), length: num(r.length, 0), sleeve: num(r.sleeve, 0) })),
     faqs: arr(s.faqs)
-      .map((f) => ({ q: str(f.q, 200), a: str(f.a, 1500) }))
+      .map((f) => ({ q: str(f.q, 200), a: str(f.a, 1500, true) }))
       .filter((f) => f.q && f.a)
       .slice(0, 40),
     socials: { instagram: link(s.socials?.instagram), tiktok: link(s.socials?.tiktok), facebook: link(s.socials?.facebook) },
@@ -67,17 +66,18 @@ export const PUT = adminRoute(async (req: Request) => {
           image: url(c.image),
           accent: /^#[0-9a-f]{6}$/i.test(str(c.accent, 7)) ? str(c.accent, 7) : "#F0609A",
         }));
-        if (next.some((c) => !c.slug || !c.name)) throw new Error("Every collection needs a name.");
-        if (new Set(next.map((c) => c.slug)).size !== next.length) throw new Error("Two collections have the same name.");
+        if (next.some((c) => !c.slug || !c.name)) throw new UserError("Every collection needs a name.");
+        if (new Set(next.map((c) => c.slug)).size !== next.length) throw new UserError("Two collections have the same name.");
         const used = new Set(db.products.map((p) => p.collection));
         const missing = [...used].filter((slug) => !next.some((c) => c.slug === slug));
-        if (missing.length) throw new Error(`You can't remove a collection that still has products (${missing.join(", ")}).`);
+        if (missing.length) throw new UserError(`You can't remove a collection that still has products (${missing.join(", ")}).`);
         db.collections = next;
       }
       db.settings = settings;
     });
   } catch (e) {
-    return bad(e instanceof Error ? e.message : "Could not save.");
+    if (e instanceof UserError) return bad(e.message);
+    throw e;
   }
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });

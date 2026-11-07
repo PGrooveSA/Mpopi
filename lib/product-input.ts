@@ -2,25 +2,21 @@ import "server-only";
 import { nanoid } from "nanoid";
 import { ALL_SIZES, type DB, type Product, type Size, type ProductColor, type Variant } from "./types";
 import { slugify } from "./shop";
-import { str, num } from "./api";
+import { str, num, safeImageUrl, UserError } from "./api";
 
-const URL_RE = /^(\/[\w\-./]+|https:\/\/[\w\-./%?=&]+)$/;
-const cleanUrl = (v: unknown) => {
-  const s = str(v, 500);
-  return URL_RE.test(s) ? s : "";
-};
+const cleanUrl = safeImageUrl;
 
 export function parseProduct(input: Record<string, unknown>, db: DB, existing?: Product): Product {
   const name = str(input.name, 120);
-  if (!name) throw new Error("Product name is required.");
+  if (!name) throw new UserError("Product name is required.");
   const price = Math.round(num(input.price, -1));
-  if (!(price > 0)) throw new Error("Price must be more than 0.");
+  if (!(price > 0)) throw new UserError("Price must be more than 0.");
   const collection = str(input.collection, 60);
-  if (!db.collections.some((c) => c.slug === collection)) throw new Error("Please choose a collection.");
+  if (!db.collections.some((c) => c.slug === collection)) throw new UserError("Please choose a collection.");
 
   const sizes = (Array.isArray(input.sizes) ? input.sizes : []).filter((s): s is Size => ALL_SIZES.includes(s as Size));
   const orderedSizes = ALL_SIZES.filter((s) => sizes.includes(s));
-  if (!orderedSizes.length) throw new Error("Choose at least one size.");
+  if (!orderedSizes.length) throw new UserError("Choose at least one size.");
 
   const colorsIn = Array.isArray(input.colors) ? input.colors : [];
   const colors: ProductColor[] = colorsIn.slice(0, 20).map((c: Record<string, unknown>) => {
@@ -34,7 +30,7 @@ export function parseProduct(input: Record<string, unknown>, db: DB, existing?: 
       photos: (Array.isArray(c.photos) ? c.photos : []).map(cleanUrl).filter(Boolean).slice(0, 12),
     };
   });
-  if (!colors.length) throw new Error("Add at least one colour.");
+  if (!colors.length) throw new UserError("Add at least one colour.");
 
   const variantsIn = Array.isArray(input.variants) ? input.variants : [];
   const variants: Variant[] = [];
@@ -60,7 +56,7 @@ export function parseProduct(input: Record<string, unknown>, db: DB, existing?: 
     slug,
     name,
     collection,
-    description: str(input.description, 3000),
+    description: str(input.description, 3000, true),
     price,
     compareAtPrice: compare > price ? compare : undefined,
     sizes: orderedSizes,

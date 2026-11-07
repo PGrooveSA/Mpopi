@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Shirt, ReceiptText, Settings, UserCog, LogOut, ExternalLink, Menu, X } from "lucide-react";
+import { LayoutDashboard, Shirt, ReceiptText, Settings, UserCog, LogOut, ExternalLink, Menu, X, ShieldCheck } from "lucide-react";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/admin/orders", label: "Orders", icon: ReceiptText },
   { href: "/admin/settings", label: "Website content", icon: Settings },
   { href: "/admin/account", label: "Account", icon: UserCog },
+  { href: "/admin/security", label: "Security", icon: ShieldCheck },
 ];
 
 export default function AdminNav({ name, email, newOrders }: { name: string; email: string; newOrders: number }) {

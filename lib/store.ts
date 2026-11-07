@@ -86,7 +86,13 @@ async function pool(): Promise<Pool> {
     url.searchParams.delete("sslmode");
     g.__mpopiPool = new Pool({
       connectionString: url.toString(),
-      ssl: local ? undefined : { rejectUnauthorized: false },
+      // TLS is always on for hosted databases. Set DATABASE_CA_CERT (Supabase → Database → SSL
+      // certificate, PEM text) to also verify the server certificate.
+      ssl: local
+        ? undefined
+        : process.env.DATABASE_CA_CERT
+          ? { ca: process.env.DATABASE_CA_CERT.replace(/\\n/g, "\n"), rejectUnauthorized: true }
+          : { rejectUnauthorized: false },
       max: 3,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 10_000,
@@ -102,6 +108,22 @@ async function pool(): Promise<Pool> {
     // Supabase exposes tables through its public REST API. Row Level Security with no policies
     // blocks that API completely; the site's own server connection (table owner) is unaffected.
     await p.query("ALTER TABLE mpopi_store ENABLE ROW LEVEL SECURITY");
+    await p.query(`CREATE TABLE IF NOT EXISTS mpopi_rate_limits (
+      key text PRIMARY KEY,
+      count integer NOT NULL,
+      reset_at timestamptz NOT NULL
+    )`);
+    await p.query("ALTER TABLE mpopi_rate_limits ENABLE ROW LEVEL SECURITY");
+    await p.query(`CREATE TABLE IF NOT EXISTS mpopi_security_log (
+      id bigserial PRIMARY KEY,
+      at timestamptz NOT NULL DEFAULT now(),
+      type text NOT NULL,
+      ip text,
+      path text,
+      detail text
+    )`);
+    await p.query("ALTER TABLE mpopi_security_log ENABLE ROW LEVEL SECURITY");
+    await p.query("CREATE INDEX IF NOT EXISTS mpopi_security_log_at ON mpopi_security_log (at DESC)");
     const { rowCount } = await p.query("SELECT 1 FROM mpopi_store WHERE id = 1");
     if (!rowCount) {
       const initial = await createInitial();
@@ -113,6 +135,12 @@ async function pool(): Promise<Pool> {
   });
   await g.__mpopiReady;
   return p;
+}
+
+/** Run a parameterised query (Postgres mode only). Values are always passed separately from the SQL. */
+export async function pgQuery<R extends Record<string, unknown> = Record<string, unknown>>(text: string, params: unknown[] = []) {
+  const p = await pool();
+  return p.query<R>(text, params);
 }
 
 async function loadPg(): Promise<DB> {

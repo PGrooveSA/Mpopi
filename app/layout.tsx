@@ -1,12 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", weight: ["400", "500", "600", "700"] });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
-// Served from the project (OFL licence) — Google Fonts returns a response for the italic-only
-// request that breaks the build on Vercel.
+// All fonts are bundled with the site (OFL licence): builds never depend on Google Fonts
+// and visitors' browsers never contact a third party for them.
+const grotesk = localFont({ src: "./fonts/SpaceGrotesk.ttf", variable: "--font-grotesk", weight: "300 700", display: "swap" });
+const manrope = localFont({ src: "./fonts/Manrope.ttf", variable: "--font-manrope", weight: "200 800", display: "swap" });
 const playfair = localFont({
   src: "./fonts/PlayfairDisplay-Italic.ttf",
   variable: "--font-playfair",
@@ -14,6 +13,9 @@ const playfair = localFont({
   weight: "400 900",
   display: "swap",
 });
+
+// Every page is rendered per request so it can carry the CSP nonce set in middleware.ts.
+export const dynamic = "force-dynamic";
 
 const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 

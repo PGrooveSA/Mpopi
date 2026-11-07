@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { mutate } from "@/lib/store";
-import { rateLimit, clientIp } from "@/lib/auth";
+import { rateLimit, logSecurity, clientIp } from "@/lib/security";
 import { bad, str } from "@/lib/api";
 import { orderMessage, whatsappLink, normalisePhone } from "@/lib/shop";
 import { ALL_SIZES, type Order, type OrderItem, type Size } from "@/lib/types";
@@ -9,17 +9,22 @@ import { ALL_SIZES, type Order, type OrderItem, type Size } from "@/lib/types";
 class OrderError extends Error {}
 
 export async function POST(req: Request) {
-  if (!rateLimit("order:" + clientIp(req), 8, 10 * 60 * 1000)) {
-    return bad("Too many orders from this device. Please try again in a few minutes.", 429);
+  const rl = await rateLimit(`order:${clientIp(req)}`, 8, 10 * 60);
+  if (!rl.ok) {
+    await logSecurity("rate_limited", req, "too many orders from this IP");
+    return NextResponse.json({ error: "Too many orders from this device. Please try again in a few minutes." }, { status: 429, headers: { "Retry-After": String(rl.retryAfter) } });
   }
+  if (Number(req.headers.get("content-length") || 0) > 50_000) return bad("Request too large.", 413);
   const body = await req.json().catch(() => null);
   if (!body || !Array.isArray(body.items) || body.items.length === 0) return bad("Your cart is empty.");
   if (body.items.length > 50) return bad("Too many items in one order.");
 
   const name = str(body.customer?.name, 100);
   const phone = str(body.customer?.phone, 30);
+  const email = str(body.customer?.email, 200);
   if (name.length < 2) return bad("Please enter your name.");
-  if (normalisePhone(phone).length < 9) return bad("Please enter a valid WhatsApp number.");
+  if (!/^[+\d\s()-]{9,30}$/.test(phone) || normalisePhone(phone).length < 9 || normalisePhone(phone).length > 15) return bad("Please enter a valid WhatsApp number.");
+  if (email && !/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(email)) return bad("Please enter a valid email address, or leave it empty.");
 
   try {
     const result = await mutate((db) => {
@@ -77,10 +82,10 @@ export async function POST(req: Request) {
         customer: {
           name,
           phone,
-          email: str(body.customer?.email, 200) || undefined,
+          email: email || undefined,
           address: address || undefined,
           city: city || undefined,
-          note: str(body.customer?.note, 500) || undefined,
+          note: str(body.customer?.note, 500, true) || undefined,
         },
         delivery: { id: delivery.id, name: delivery.name, price: delivery.price },
         items,
