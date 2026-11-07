@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Manrope, Playfair_Display } from "next/font/google";
+import { Space_Grotesk, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", weight: ["400", "500", "600", "700"] });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", style: ["italic"], weight: ["700", "800"] });
+// Served from the project (OFL licence) — Google Fonts returns a response for the italic-only
+// request that breaks the build on Vercel.
+const playfair = localFont({
+  src: "./fonts/PlayfairDisplay-Italic.ttf",
+  variable: "--font-playfair",
+  style: "italic",
+  weight: "400 900",
+  display: "swap",
+});
 
 const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
