@@ -1,0 +1,43 @@
+{
+  "name": "mpopi-store",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "reset-data": "node -e \"require('fs').rmSync('data',{recursive:true,force:true});console.log('Data reset - the shop will reseed on next start')\"",
+    "assets": "python scripts/process-assets.py"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.15",
+    "lucide-react": "^1.70.0",
+    "nanoid": "^5.1.16",
+    "next": "^15.5.29",
+    "pg": "^8.23.1",
+    "react": "^19.1.10",
+    "react-dom": "^19.1.10",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.5",
+    "three": "^0.187.0",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

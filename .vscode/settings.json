@@ -1,0 +1,10 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.associations": { "*.css": "tailwindcss" },
+  "tailwindCSS.experimental.classRegex": [["`([^`]*)`", "([^\\s`]+)"]],
+  "search.exclude": { "**/.next": true, "**/data": true, "**/node_modules": true },
+  "files.exclude": { "**/.next": true, "**/.next-build": true }
+}
