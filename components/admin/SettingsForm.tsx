@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowDown, ArrowUp, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, SpinnerGap as Loader2, Plus, FloppyDisk as Save, Trash as Trash2 } from "@phosphor-icons/react";
 import type { Collection, Settings } from "@/lib/types";
 import { Card, ImageField, PageHeader, Toggle, useToast, uploadImage } from "./ui";
 

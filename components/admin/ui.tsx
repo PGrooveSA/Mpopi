@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { Loader2, Upload, X } from "lucide-react";
+import { SpinnerGap as Loader2, UploadSimple as Upload, X } from "@phosphor-icons/react";
 
 export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
   return (
@@ -90,7 +90,7 @@ export function ImageField({
           e.preventDefault();
           pick(e.dataTransfer.files[0]);
         }}
-        style={kind === "print" ? { backgroundImage: "repeating-conic-gradient(#0000000a 0% 25%, transparent 0% 50%)", backgroundSize: "16px 16px" } : undefined}
+        style={kind === "print" ? { backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='8' height='8' fill='%23000' fill-opacity='.05'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23000' fill-opacity='.05'/%3E%3C/svg%3E\")" } : undefined}
       >
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowLeft, Copy, Loader2, MessageCircle, Phone, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, SpinnerGap as Loader2, WhatsappLogo as MessageCircle, Phone, Trash as Trash2 } from "@phosphor-icons/react";
 import type { Order, OrderStatus } from "@/lib/types";
 import { ORDER_STATUSES } from "@/lib/types";
 import { formatPrice, STATUS_LABEL, whatsappLink } from "@/lib/shop";
@@ -11,9 +11,9 @@ import { Card, PageHeader, useToast } from "./ui";
 
 const NEXT_MESSAGE: Partial<Record<OrderStatus, (o: Order, store: string) => string>> = {
   awaiting_payment: (o, s) =>
-    `Hi ${o.customer.name.split(" ")[0]}! Thank you for your ${s} order ${o.ref} 💗\n\nYour total is ${formatPrice(o.total)}. Here are our payment details:\n\n[add your bank details here]\n\nPlease use ${o.ref} as the reference and send proof of payment here.`,
-  paid: (o) => `Hi ${o.customer.name.split(" ")[0]}! We've received your payment for ${o.ref} 🎉 We'll let you know as soon as it ships.`,
-  shipped: (o) => `Hi ${o.customer.name.split(" ")[0]}! Your order ${o.ref} is on its way 🚚 [add tracking number here]`,
+    `Hi ${o.customer.name.split(" ")[0]}! Thank you for your ${s} order ${o.ref}\n\nYour total is ${formatPrice(o.total)}. Here are our payment details:\n\n[add your bank details here]\n\nPlease use ${o.ref} as the reference and send proof of payment here.`,
+  paid: (o) => `Hi ${o.customer.name.split(" ")[0]}! We've received your payment for ${o.ref} We'll let you know as soon as it ships.`,
+  shipped: (o) => `Hi ${o.customer.name.split(" ")[0]}! Your order ${o.ref} is on its way [add tracking number here]`,
 };
 
 export default function OrderDetail({

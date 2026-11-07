@@ -1,4 +1,4 @@
-import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { ShieldWarning as ShieldAlert, ShieldCheck } from "@phosphor-icons/react/dist/ssr";
 import { recentSecurityEvents, type SecurityEventType } from "@/lib/security";
 import { PageHeader } from "@/components/admin/ui";
 import SignOutEverywhere from "@/components/admin/SignOutEverywhere";
@@ -41,7 +41,7 @@ export default async function SecurityPage() {
           ["Suspicious IPs (24h)", ips],
         ].map(([label, n]) => (
           <div key={label as string} className="glass rounded-[1.75rem] p-5">
-            {Number(n) > 0 ? <ShieldAlert className="h-6 w-6 text-hot" /> : <ShieldCheck className="h-6 w-6 text-emerald-600" />}
+            {Number(n) > 0 ? <ShieldAlert className="h-6 w-6 text-[#c4372f]" weight="fill" /> : <ShieldCheck className="h-6 w-6 text-[var(--a-green-deep)]" weight="fill" />}
             <p className="font-display mt-3 text-2xl font-bold">{n as number}</p>
             <p className="text-xs font-semibold text-ink-soft">{label as string}</p>
           </div>

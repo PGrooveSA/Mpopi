@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, LogOut } from "lucide-react";
+import { SpinnerGap as Loader2, SignOut as LogOut } from "@phosphor-icons/react";
 
 /** Revokes every session for this admin account (all devices), then returns to the login page. */
 export default function SignOutEverywhere() {

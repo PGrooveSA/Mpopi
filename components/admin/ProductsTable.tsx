@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Plus, Search, Eye, EyeOff, Pencil, Trash2, PackageX, Loader2, Star } from "lucide-react";
+import { Plus, MagnifyingGlass as Search, Eye, EyeSlash as EyeOff, PencilSimple as Pencil, Trash as Trash2, Package as PackageX, SpinnerGap as Loader2, Star } from "@phosphor-icons/react";
 import type { Collection, Product } from "@/lib/types";
 import { formatPrice, isSoldOut, totalStock } from "@/lib/shop";
 import TeeMockup from "../TeeMockup";

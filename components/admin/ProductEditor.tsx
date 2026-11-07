@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowLeft, Loader2, Plus, Save, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, SpinnerGap as Loader2, Plus, FloppyDisk as Save, Trash as Trash2, Sparkle as Sparkles } from "@phosphor-icons/react";
 import type { Collection, ProductColor, Size, Variant } from "@/lib/types";
 import { ALL_SIZES } from "@/lib/types";
 import TeeMockup from "../TeeMockup";
@@ -312,7 +312,7 @@ export default function ProductEditor({ initial, collections }: { initial: Draft
                 ))}
               </div>
             </div>
-            <div className="aspect-square rounded-3xl bg-gradient-to-br from-white to-white/40">
+            <div className="aspect-square rounded-2xl bg-[var(--a-soft)]">
               {color && (
                 <TeeMockup
                   hex={color.hex}

@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Loader2, Trash2, UserPlus } from "lucide-react";
+import { SpinnerGap as Loader2, Trash as Trash2, UserPlus } from "@phosphor-icons/react";
 import { Card, PageHeader, useToast } from "./ui";
 
 type A = { id: string; email: string; name: string };
